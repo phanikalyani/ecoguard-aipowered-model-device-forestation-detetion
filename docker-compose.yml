@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  backend:
+    build: ./EcoGuard-backend
+    container_name: ecoguard-backend
+    env_file:
+      - ./EcoGuard-backend/.env.example
+    environment:
+      - DB_PATH=/app/alerts.db
+      - FCM_TOPIC=rangers
+      - FLASK_DEBUG=false
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/serviceAccountKey.json
+    volumes:
+      - ./EcoGuard-backend:/app
+      - ./secrets/serviceAccountKey.json:/secrets/serviceAccountKey.json:ro
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  dashboard:
+    build: ./EcoGuard-dashboard
+    container_name: ecoguard-dashboard
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    volumes:
+      - ./EcoGuard-dashboard:/app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
